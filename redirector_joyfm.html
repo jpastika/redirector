@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redirector</title>
+    <meta charset='utf-8' />
+    <style>
+      body{
+        font:.9em Verdana, Arial, Helvetica, sans-serif;
+        color:#000;
+        line-height:1.5em;
+        padding:0;
+        margin:0;
+      }
+
+      #container{
+        width:100%;
+      }
+    
+      #page{
+        width:950px;
+      }     
+
+      #title{
+        width:100%;
+        padding: 0 0 20px 0;
+      }
+
+      #body{
+        width:100%;
+      }
+      
+      #search_container{
+        width:33%;
+        float:left;
+        padding:20px;
+      }
+      
+      #intro{
+        padding-bottom:10px;
+      }
+
+      #search{
+        padding:10px;
+        background:#474747;
+        color:#fff;
+        box-shadow: 0 0px 5px #333;
+          -o-box-shadow: 0 0px 5px #333;
+          -webkit-box-shadow: 0 0px 5px #333;
+          -moz-box-shadow: 0 0px 5px #333;
+        text-shadow: #000 -1px -1px 1px;
+          -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        font-size:.9em;
+        vertical-align:top;
+      }
+      
+      #search form{
+        padding:0;
+        margin:0;
+      }
+      
+      #search input{
+        font-size:16px;
+        width:48%;
+        margin:0 0 0 0;
+        vertical-align:middle;
+      }
+
+      #search button{
+      }
+
+      #search_label{
+        font:1.2em Verdana, Arial, Helvetica, sans-serif;
+        padding-bottom:5px; 
+      }
+      
+      #message{
+        margin-top:10px;
+        padding:10px;
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        color:#000;
+        text-shadow: #ddd -1px -1px 1px;
+        font-size:.8em;
+      }
+
+      #message ul{
+        list-style:none;        
+      }
+
+      #message li{
+        margin-bottom: 20px;
+      }
+
+      #message.found{
+        background:#eeeeee;
+      }
+
+      #message.notfound{
+        background:#f1e2e2;
+      }
+      
+      #message.notfound ol{
+        
+      }
+      
+      #message a, #message a:hover, #message a:active, #message a:visited{
+        color:#fff;
+        background:#ab1c2d;
+        padding:5px;
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        text-shadow:none;
+      }
+      
+      #message .callout{
+        color:#ab1c2d;
+      }
+      
+      #search_footer{
+        padding-top:10px;
+      }
+      
+      #stations_container{
+        width:62%;
+        float:right;
+        padding:0;
+      }
+      
+      .hidden{
+        display:none;
+      }
+      
+      th{
+        background:#474747;
+        color:#fff;
+        font-size: .7em;
+        font-weight:normal;
+        text-align: left;
+        padding: 2px 10px;
+      }
+      
+      td{
+        font-size:.7em;
+        padding: 2px 10px;
+      }
+      
+      tr{
+        background:#eeeeee;
+      }
+      
+      .alternate_row{
+        background:#fff;
+      }
+      
+      td a, td a:hover, td a:active, td a:visited{
+        color:#474747;
+        cursor:pointer;
+      }
+      
+      tbody tr:hover{
+        background:#676767;
+      }
+      
+      tbody tr:hover a{
+        color:#fff;
+      }
+      
+      td div{
+        width:100%;
+      }
+      
+      .small{
+        font-size:10px;
+        font-weight:normal;
+      }
+      
+      .white{
+        color:#fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="page">
+        <div id="body">
+          <div id="search_container">
+            <div id="title" align="left"><img src="http://web.thejoyfm.com/sharathon/joylogo.png"></div>
+            <div id="intro">
+              Thank you for calling <b>The JOY FM</b>. <br> Are you calling to make a gift?
+            </div>
+            <div id="search">
+              <div id="search_label">
+                Can I have your zip code?
+              </div>
+              <form id="redirector" _lpchecked="1" onsubmit="doSearch();return false;">
+                <input type="text" id="zip" name="zip" size="10">&nbsp;<input type="submit" value="Lookup" id="lookup_submit">
+              </form>
+            </div>
+          <div id="message"></div>
+            <div id="search_footer">
+              If the caller would like to speak to someone on staff, have them call<br><b>1-877-701-5218</b>.
+            </div>
+          </div>
+          <div id="stations_container">
+            <div id="stations" class="hidden">
+              <span class="small">(Click on heading to sort each column)</span>
+              <table width="100%" cellpadding="5" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th onclick="doSort('STATE')">State</th>
+                    <th onclick="doSort('FREQUENCY')">Frequency</th>
+                    <th onclick="doSort('LOCATION')">Location</th>
+                    <th onclick="doSort('STATION')">Station</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var API_KEY = 'AIzaSyCfcwbi1tPFJAuqRzTpBPCy_u2pgMys58c';
+      var SHEETID = '11O34o9kOjbrH-3p4idGqcs7qQm0eCVSF-Mrkz6DNKL0';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+
+      var DENARI_URL = "https://www.denarionline.com/SAT_FT/di_survey.asp?COMP_REF=_#{DATABASE}&SURVEYCODE=DONOR&SATHON=YES&LOCAL=YES&VOL=YES";
+      
+      var stationFamily = 'JOYFM';
+      var station_data_store = 'joyfm_stationdata';
+      var zip_data_store = 'joyfm_zipdata';
+      var sortColumn = 'FREQUENCY';
+      var sortColumnDirection = 'ASC';
+      var sortCompareType = 'numeric';
+      var zip_data_loaded = false;
+      var station_data_loaded = false;
+      var zips = [];
+      var stations = [];
+      var radioStations = [];
+
+      function getStationData() {
+        var params = {
+          spreadsheetId: SHEETID,
+          range: 'A2:S101'
+        };
+
+        var request = gapi.client.sheets.spreadsheets.values.get(params);
+        request.then(function(response) {
+          var range = response.result;
+          transformStationData(range);
+        }, function(reason) {
+          console.error('error: ' + reason.result.error.message);
+        });
+      }
+
+      function transformStationData(data){
+        var stations = new Array();
+        for (i = 0; i < data.values.length; i++) {
+          var row = data.values[i];
+          if (row[7] == stationFamily && row[15] == 'Yes')
+            stations.push([row[2], row[3], row[4], row[5], row[6], row[10], row[11], row[12], row[13], row[14], row[15], row[17], row[18]]);
+        }
+        localStorage.setItem(station_data_store, JSON.stringify(stations));
+
+        is_data_loaded();
+      }
+
+      function getZipData() {
+        var params = {
+          spreadsheetId: SHEETID,
+          range: 'ZipSignal'+ stationFamily+'!A2:I'
+        };
+
+        var request = gapi.client.sheets.spreadsheets.values.get(params);
+        request.then(function(response) {
+          var range = response.result;
+          transformZipData(range);
+        }, function(reason) {
+          console.error('error: ' + reason.result.error.message);
+        });
+      }
+
+      function transformZipData(data){
+        var zips = new Array();
+        for (i = 0; i < data.values.length; i++) {
+          var row = data.values[i];
+          zips.push([row[0], row[1], row[2], row[3], row[4], row[5], row[7], row[8]]);
+        }
+        localStorage.setItem(zip_data_store, JSON.stringify(zips));
+
+        is_data_loaded();
+      }
+
+      function check_data(){
+        if (localStorage.getItem(station_data_store) != null){
+          stations = JSON.parse(localStorage.getItem(station_data_store));
+          station_data_loaded = true;
+        }
+        if (localStorage.getItem(zip_data_store) != null){
+          zips = JSON.parse(localStorage.getItem(zip_data_store));
+          zip_data_loaded = true;
+        }
+
+        return station_data_loaded && zip_data_loaded;
+      }
+
+      function is_data_loaded(){
+        if (check_data()){
+          renderStationsTable();
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+
+
+      function initClient() {
+        gapi.client.init({
+          'apiKey': API_KEY,
+          'scope': SCOPES,
+          'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+        }).then(function() {
+          getStationData();
+          getZipData();
+        });
+      }
+
+      function handleClientLoad() {
+        gapi.load('client', initClient);
+      }
+
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+      function handleDataLoad(){
+        if (!is_data_loaded())
+          handleClientLoad();
+      }
+
+      function doSearch(){
+        var stations = document.getElementById("stations");
+        stations.classList.add("hidden");
+        var messagecontainer = document.getElementById("message");
+        messagecontainer.classList.remove("notfound");
+        messagecontainer.classList.remove("found");
+        var val = document.forms["redirector"].zip.value;
+        if (val)
+          doZipLookup(val);
+      }
+
+      function doZipLookup(zip){
+        var results = [];
+        results = findMatchingZips(zip, results);
+        handleResults(results, zip);
+      }
+
+      function findMatchingZips(zip, results){
+        if (check_data()){
+          for (var i = zips.length-1; i >= 0; i--) {
+            if (zips[i][4] == zip)
+              results.push(zips[i]);
+          }
+        }
+
+        return results;
+      }
+
+      function handleResults(results, zip){
+        document.getElementById('message').innerHTML = '';
+        if (!results.length){
+          handleNoResults();
+          return;
+        }
+        if (results.length > 1){
+          handleMultipleResults(results, zip);
+          return;
+        }
+        handleSingleResult(results[0], zip);
+      }
+
+      function handleNoResults(){
+        displayNoMatchMessage();
+        displayStationsTable();
+      }
+
+      function handleSingleResult(result, zip){
+        displaySingleMatchMessage(result, zip);
+      }
+
+      function handleMultipleResults(results, zip){
+        var matches = getManyMatchesOptions(results)
+        if (matches.length > 1)
+          displayMultipleMatchMessage(matches, zip);
+        else
+          displaySingleMatchMessage(matches[0], zip)
+      }
+
+      function displayNoMatchMessage(){
+        var message = 'I\'m having trouble finding the correct station for your area. Do you know either:';
+        message += '<br><ol>';
+        message += '<li>The city and state where the station you listen to comes from.</li>';
+        message += '<li>The frequency you tune your radio toto hear us...</li>';
+        message += '<li>Do you listen online?</li>';
+        message += '</ol>(Please select from the list to the right.)';
+        document.getElementById('message').innerHTML = message;
+        var messagecontainer = document.getElementById("message");
+        messagecontainer.classList.add("notfound");
+      }
+
+      function displayStationsTable(){
+        var stations = document.getElementById("stations");
+
+        stations.classList.remove("hidden");
+      }
+
+      function displaySingleMatchMessage(match, zip){
+        var message = 'Thanks! <b class="callout">' + zip + '</b> is <b class="callout">'+ match[6] +'</b>. Is this correct?';
+        message += '<br><br>Confirm with donor and <a href="'+ getDenariLinkByZip(match) +'">click here</a>.';
+        message += '<br><br>(If incorrect, please reenter zip code and try again.)';
+        
+        document.getElementById('message').innerHTML = message;
+        var messagecontainer = document.getElementById("message");
+        messagecontainer.classList.add("found");
+      }
+
+      function displayMultipleMatchMessage(matches, zip){
+        var message = 'Thanks! <b class="callout">' + zip + '</b> is <b class="callout">'+ matches[0][6] +'</b>. If this is correct, which of the following do you listen to?<br><br>';
+        message += getManyMatchesOptionsMessage(matches);
+        message += '<br>(If incorrect, please reenter zip code and try again.)';
+        
+        document.getElementById('message').innerHTML = message;
+        var messagecontainer = document.getElementById("message");
+        messagecontainer.classList.add("found");
+      }
+
+      function getManyMatchesOptionsMessage(matches){
+        var message = '';
+        for(var i=0; i<matches.length; i++){
+          message += '<a href="'+ getDenariLinkByZip(matches[i]) +'">'+ matches[i][8] +'</a><br>'
+        }
+
+        return message
+      }
+
+      function getManyMatchesOptions(matches){
+        for(var i=0; i<matches.length; i++){
+          var station = getStationByCallSign(matches[i][1]);
+          matches[i].push(station[11]);
+        }
+
+        var sortZips = matches.sort(function(a, b){return a[8].localeCompare(b[8]);});
+        var currentGroup = sortZips[0][8];
+        var currentHighestStrength = Number(sortZips[0][5]);
+        var selectedZip = sortZips[0];
+        var selectedZips = [];
+        
+        for (var i=0; i<sortZips.length; i++){
+          if(sortZips[i][8] != currentGroup){
+            selectedZips.push(selectedZip)
+            selectedZip = sortZips[i]
+            currentGroup = sortZips[i][8];
+            currentHighestStrength = Number(sortZips[i][5]);
+          }
+          if(Number(sortZips[i][5]) > currentHighestStrength){
+            selectedZip = sortZips[i];
+          }
+        }
+        selectedZips.push(selectedZip);
+        return selectedZips;
+      }
+
+      function getDenariLinkByZip(match){
+        var station = getStationByCallSign(match[1]);
+        var database = station[7].substring(1);
+        var p1 = '&P1='+station[11];
+        var p2 = '&P2='+match[2];
+        var p3 = '&P3='+match[3];
+        var p4 = '&P4='+match[4];
+        var p5 = '&P5='+escape(station[5]);
+        var p6 = '&P6='+escape(station[8]);
+        
+        return DENARI_URL.replace('#{DATABASE}', database) + p1 + p2 + p3 + p4 + p5 + p6;
+      }
+
+      function getDenariLinkByStation(match){
+        var database = match[7].substring(1);
+        var p1 = '&P1=undefined';
+        var p5 = '&P5='+escape(match[5]);
+        var p6 = '&P6='+escape(match[8]);
+        
+        return DENARI_URL.replace('#{DATABASE}', database) + p1 + p5 + p6;
+      }
+
+      function doSort(column){
+        if (column == sortColumn)
+          switchSortColumnDirection();
+        else {
+          sortColumn = column;
+          sortColumnDirection = 'ASC';
+        }
+        radioStations = sortStations();
+        clearStationsTableRows();
+        renderStationsTableRows();
+      }
+
+      function switchSortColumnDirection(){
+        if (sortColumnDirection == 'ASC'){
+          sortColumnDirection = 'DESC';
+          return;
+        }
+        sortColumnDirection = 'ASC';
+      }
+
+      function renderStationsTable(){
+        getRadioStations();
+        radioStations = sortStations();
+        renderStationsTableRows();
+      }
+
+      function getRadioStations(){
+        for(var i=0; i < stations.length; i++){
+          if (stations[i][1] != 'ONLINE')
+            radioStations.push(stations[i]);
+        }
+      }
+
+      function sortStations(){
+        var sortColumnNumber = getSortColumnNumber();
+        if (sortCompareType == 'string'){
+          return sortStationsString(sortColumnNumber);
+        }
+        return sortStationsNumeric(sortColumnNumber);
+      }
+
+      function sortStationsNumeric(columnNumber){
+        if (sortColumnDirection == 'ASC')
+          return radioStations.sort(function(a, b){return a[columnNumber]-b[columnNumber]});
+        else
+          return radioStations.sort(function(a, b){return b[columnNumber]-a[columnNumber]});
+      }
+
+      function sortStationsString(columnNumber){
+        if (sortColumnDirection == 'ASC')
+          return radioStations.sort(function(a, b){return a[columnNumber].localeCompare(b[columnNumber]);});
+        else
+          return radioStations.sort(function(a, b){return b[columnNumber].localeCompare(a[columnNumber]);});
+      }
+
+      function getSortColumnNumber(){
+        if (sortColumn == 'STATE'){
+          sortCompareType = 'string';
+          return 6;
+        }
+        if (sortColumn == 'FREQUENCY'){
+          sortCompareType = 'numeric';
+          return 1;
+        }
+        if (sortColumn == 'LOCATION'){
+          sortCompareType = 'string';
+          return 5;
+        }
+        sortCompareType = 'string'
+        return 10
+      }
+
+      function renderStationsTableRows(){
+        renderRadioStationsForTable();
+        renderOnlineStationsForTable();
+      }
+
+      function renderRadioStationsForTable(){
+        var isalt = false;
+        for(var i=0; i < radioStations.length; i++){
+          renderStationTableRow(radioStations[i], isalt);
+          isalt = !isalt;
+        }
+      }
+
+      function renderOnlineStationsForTable(){
+        var isalt = false;
+        for(var i=0; i < stations.length; i++){
+          if (stations[i][1] == 'ONLINE') {
+            renderStationTableRow(stations[i], isalt);
+            isalt = !isalt;
+          }
+        }
+      }
+
+      function clearStationsTableRows(){
+        var table = document.getElementById("stations").getElementsByTagName('tbody')[0];
+        table.innerHTML = '';
+      }
+
+      function renderStationTableRow(station, isalt){
+        var table = document.getElementById("stations").getElementsByTagName('tbody')[0];
+        var row = table.insertRow(table.rows.length);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+
+        if(isalt)
+          row.classList.add('alternate_row')
+
+        var denari_url = getDenariLinkByStation(station);
+
+        cell1.innerHTML = '<a href="'+ denari_url +'">'+ station[6] +'</a>';
+        cell2.innerHTML = '<a href="'+ denari_url +'">'+ getStationTableFrequency(station) +'</a>';
+        cell3.innerHTML = '<a href="'+ denari_url +'">'+ station[5] +'</a>';
+        cell4.innerHTML = '<a href="'+ denari_url +'">'+ station[11] +'</a>';
+      }
+
+      function getStationTableFrequency(station){
+        var frequency = station[1];
+        if (station[3] && station[3].length)
+          frequency + '/' + station[3];
+        return frequency;
+      }
+
+      function getStationByCallSign(callsign){
+        for(var i = stations.length -1; i >= 0; i--){
+          if (stations[i][0] == callsign)
+            return stations[i];
+        }
+      }
+    </script>
+
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="handleDataLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+  </body>
+</html>
