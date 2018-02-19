@@ -182,6 +182,10 @@
         color:#fff;
       }
     </style>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="handleDataLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
   </head>
   <body>
     <div id="container">
@@ -640,11 +644,6 @@
             return stations[i];
         }
       }
-    </script>
-
-    <script async defer src="https://apis.google.com/js/api.js"
-      onload="handleDataLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
     </script>
   </body>
 </html>
