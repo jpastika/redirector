@@ -339,9 +339,9 @@
         });
       }
 
-      {# function handleClientLoad() {
-        gapi.load('client', initClient);
-      } #}
+      // function handleClientLoad() {
+      //  gapi.load('client', initClient);
+      //}
 
       function appendPre(message) {
         var pre = document.getElementById('content');
@@ -644,7 +644,7 @@
       }
     </script>
     <script async defer src="https://apis.google.com/js/api.js"
-      onload="window.handleDataLoad()"
+      onload="handleDataLoad()"
       onreadystatechange="if (this.readyState === 'complete') this.onload()">
     </script>
   </body>
