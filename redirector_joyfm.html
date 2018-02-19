@@ -354,8 +354,10 @@
       }
 
       function handleDataLoad(){
-        if (!is_data_loaded())
-          handleClientLoad();
+        //if (!is_data_loaded())
+        //  handleClientLoad();
+        
+        gapi.load('client', initClient);
       }
 
       function doSearch(){
