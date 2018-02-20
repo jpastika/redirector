@@ -327,7 +327,6 @@
         }
       }
 
-
       function initClient() {
         gapi.client.init({
           'apiKey': API_KEY,
@@ -339,9 +338,9 @@
         });
       }
 
-      // function handleClientLoad() {
-      //  gapi.load('client', initClient);
-      //}
+      function handleClientLoad() {
+        gapi.load('client', initClient);
+      }
 
       function appendPre(message) {
         var pre = document.getElementById('content');
@@ -350,10 +349,8 @@
       }
 
       function handleDataLoad(){
-        //if (!is_data_loaded())
-        //  handleClientLoad();
-        
-        gapi.load('client', initClient);
+        if (!is_data_loaded())
+          handleClientLoad();
       }
 
       function doSearch(){
