@@ -9,14 +9,15 @@ function setFrequency(){
     var sel = document.forms[0].JUR_REF;
     var P1 = querySt("P1");
     var P5 = querySt("P5");
-    var P6 = querySt("P6").toLowerCase();
+    var P6 = unescape(querySt("P6")).toLowerCase();
+    console.log(P6);
 
     var idx = 0;
     if(unescape(P5).includes('Online at')){
         sel.selectedIndex = sel.options.length - 1;
     } else {
         for (var i = 0; i < sel.options.length; i++) {
-            if (sel.options[i].text.toLowerCase() === unescape(P6)) {
+            if (sel.options[i].text.toLowerCase() === P6) {
                 sel.selectedIndex = i;
                 break;
             }
