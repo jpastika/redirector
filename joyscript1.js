@@ -10,8 +10,7 @@ function setFrequency(){
     var P1 = querySt("P1");
     var P5 = querySt("P5");
     var P6 = unescape(querySt("P6")).toLowerCase();
-    console.log(P6);
-
+    
     var idx = 0;
     if(unescape(P5).includes('Online at')){
         sel.selectedIndex = sel.options.length - 1;

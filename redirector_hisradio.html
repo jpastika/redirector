@@ -327,7 +327,6 @@
         }
       }
 
-
       function initClient() {
         gapi.client.init({
           'apiKey': API_KEY,
@@ -339,13 +338,7 @@
         });
       }
 
-      function appendPre(message) {
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
-
-      function handleDataLoad(){
+      function handleClientLoad() {
         gapi.load('client', initClient);
       }
 
@@ -572,7 +565,7 @@
           return 5;
         }
         sortCompareType = 'string'
-        return 10
+        return 11
       }
 
       function renderStationsTableRows(){
