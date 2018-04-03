@@ -281,7 +281,7 @@
       function getZipData() {
         var params = {
           spreadsheetId: SHEETID,
-          range: 'ZipSignal'+ stationFamily.replace(' ','')+'!A2:I'
+          range: 'ZipSignal'+ stationFamily+'!A2:I'
         };
 
         var request = gapi.client.sheets.spreadsheets.values.get(params);
@@ -340,6 +340,17 @@
 
       function handleClientLoad() {
         gapi.load('client', initClient);
+      }
+
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+      function handleDataLoad(){
+        if (!is_data_loaded())
+          handleClientLoad();
       }
 
       function doSearch(){
