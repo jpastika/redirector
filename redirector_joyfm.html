@@ -464,7 +464,7 @@
           matches[i].push(station[11]);
         }
 
-        var sortZips = matches.sort(function(a, b){return a[8].localeCompare(b[8]);});
+        var sortZips = matches.sort(function(a, b){return a[5].localeCompare(b[5]);});
         var currentGroup = sortZips[0][8];
         var currentHighestStrength = Number(sortZips[0][5]);
         var selectedZip = sortZips[0];
